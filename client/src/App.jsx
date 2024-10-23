@@ -1,18 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react';
+import RuleForm from './components/RuleForm';
+import RuleList from './components/RuleList';
+import { getRules, evaluateRule } from './api';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+    const [rules, setRules] = useState([]);
 
-  return (
-    <>
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-    </>
-  )
-}
+    const fetchRules = async () => {
+        const fetchedRules = await getRules();
+        setRules(fetchedRules);
+    };
 
-export default App
+    const handleRuleCreated = (newRule) => {
+        setRules((prevRules) => [...prevRules, newRule]);
+    };
+
+    const handleEvaluate = async (ruleId) => {
+        const data = { age: 32, location: 'NY' }; 
+        const result = await evaluateRule(ruleId, data);
+        alert(`Evaluation Result: ${result}`);
+    };
+
+    useEffect(() => {
+        fetchRules();
+    }, []);
+
+    return (
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Rule Engine</h1>
+            <RuleForm onRuleCreated={handleRuleCreated} />
+            <RuleList rules={rules} onEvaluate={handleEvaluate} />
+        </div>
+    );
+};
+
+export default App;
