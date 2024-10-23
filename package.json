@@ -1,0 +1,24 @@
+{
+  "name": "rule-engine-ast",
+  "version": "1.0.0",
+  "description": "Rule Enginer Using AST",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/app.js",
+    "client": "npm run dev --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Saurabh13042004/rule-engine-ast.git"
+  },
+  "author": "Saurabh Shukla",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Saurabh13042004/rule-engine-ast/issues"
+  },
+  "homepage": "https://github.com/Saurabh13042004/rule-engine-ast#readme",
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
