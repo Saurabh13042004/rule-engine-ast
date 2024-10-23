@@ -66,38 +66,52 @@ This project is a simple rule engine application that determines user eligibilit
 
 4. **Open your browser and visit http://localhost:5173.**
 
-Usage
-Creating a Rule:
+## Usage
 
-Enter a rule name and the rule string in the input fields.
-Click the "Create Rule" button to save the rule.
-Evaluating a Rule:
+### Creating a Rule
 
-Click the "Evaluate" button next to any existing rule to evaluate it against predefined sample data.
-Viewing Rules:
+- Enter a rule name and the rule string in the input fields.
+- Click the "Create Rule" button to save the rule.
 
-Existing rules will be displayed in a list format.
-API Endpoints
-Backend API Endpoints
-POST /api/rules
+### Evaluating a Rule
 
-Create a new rule.
-Request Body: { "ruleName": "string", "ruleString": "string" }
-Response: Returns the created rule object.
+- Click the "Evaluate" button next to any existing rule to evaluate it against predefined sample data.
+
+### Viewing Rules
+
+- Existing rules will be displayed in a list format.
+
+## API Endpoints
+
+### Backend API Endpoints
+
+#### POST /api/rules
+
+- **Description:** Create a new rule.
+- **Request Body:**
+
+  ```json
+  {
+    "ruleName": "string",
+    "ruleString": "string"
+  }
+- Response: Returns the created rule object.
 GET /api/rules
-
-Retrieve all rules.
-Response: Returns an array of rules.
+- Description: Retrieve all rules.
+- Response: Returns an array of rules.
 POST /api/evaluate
+- Description: Evaluate a rule against provided data.
+  ```json
+   {
+  "ruleId": "string",
+  "data": {
+    "age": number,
+    "department": "string",
+    "salary": number,
+    "experience": number
+  }
+   }
 
-Evaluate a rule against provided data.
-Request Body: { "ruleId": "string", "data": { "age": number, "department": string, ... } }
-Response: Returns a boolean indicating whether the user is eligible based on the rule.
-Contributing
-Contributions are welcome! Please follow these steps:
+- Response: Returns a boolean indicating whether the user is eligible based on the rule.
 
-Fork the repository.
-Create a new branch (git checkout -b feature-YourFeature).
-Make your changes and commit them (git commit -m 'Add some feature').
-Push to the branch (git push origin feature-YourFeature).
-Open a pull request.
+
