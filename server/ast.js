@@ -1,13 +1,12 @@
 
 class Node {
     constructor(type, left = null, right = null, value = null) {
-      this.type = type;
+      this.type = type; 
       this.left = left;
       this.right = right;
-      this.value = value;
+      this.value = value; 
     }
   }
-  
 
   function parseRule(ruleString) {
     const tokens = tokenize(ruleString);
@@ -60,7 +59,7 @@ class Node {
     return parseExpression();
   }
   
-
+  // Evaluate the AST against provided data
   function evaluateAST(ast, data) {
     if (ast.type === 'operand') {
       const [attribute, operator, value] = ast.value.split(/\s+/);
