@@ -1,5 +1,3 @@
-// utils/ast.js
-
 class ASTNode {
     constructor(type, value = null, left = null, right = null) {
         this.type = type;   // "operator" for AND/OR, or "operand" for conditions
@@ -14,12 +12,12 @@ const createOperandNode = (condition) => {
     return new ASTNode('operand', condition);
 };
 
+
 // Helper to create an operator node (AND/OR)
 const createOperatorNode = (operator, left, right) => {
     return new ASTNode('operator', operator, left, right);
 };
 
-// Function to serialize the AST into JSON format
 const serializeAST = (node) => {
     if (!node) return null;
 
@@ -30,6 +28,7 @@ const serializeAST = (node) => {
         right: serializeAST(node.right)  // Recursively serialize the right child
     };
 };
+
 
 module.exports = {
     ASTNode,

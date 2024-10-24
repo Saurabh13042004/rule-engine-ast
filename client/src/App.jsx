@@ -24,7 +24,7 @@ function renderNode(node) {
 function App() {
   return (
     <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">JSON Tree Structure</h1>
+      <h1 className="text-xl font-semibold mb-4">Rule  Tree Structure</h1>
       {renderNode(data)}
     </div>
   );

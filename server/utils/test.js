@@ -1,5 +1,3 @@
-// test.js
-
 class ASTNode {
     constructor(type, value = null, left = null, right = null) {
         this.type = type;   // "operator" for AND/OR, or "operand" for conditions
@@ -19,44 +17,77 @@ const createOperatorNode = (operator, left, right) => {
     return new ASTNode('operator', operator, left, right);
 };
 
-// Function to serialize the AST into JSON format
+// Tokenize the rule string into conditions and operators
+const tokenizeRuleString = (ruleString) => {
+    // Capture conditions and operators, properly handling AND and OR
+    return ruleString.match(/(?:[a-zA-Z_]+\s*[><=]\s*'?\w+'?)|AND|OR/g);
+};
+
+// Parsing logic for building the AST from tokens
+const parseTokens = (tokens) => {
+    let index = 0;
+
+    // Parse expressions based on operator precedence
+    function parseExpression() {
+        let node = parseTerm();  // Parse AND conditions first
+
+        // OR has lower precedence, so we handle it outside the AND group
+        while (index < tokens.length && tokens[index] === "OR") {
+            const operator = tokens[index++];
+            const right = parseTerm();  // OR joins another term
+            node = createOperatorNode(operator, node, right);
+        }
+
+        return node;
+    }
+
+    // Parse terms which involve AND conditions
+    function parseTerm() {
+        let node = parseFactor();  // Get a single condition or factor
+
+        // AND has higher precedence, so we nest ANDs within the same term
+        while (index < tokens.length && tokens[index] === "AND") {
+            const operator = tokens[index++];
+            const right = parseFactor();
+            node = createOperatorNode(operator, node, right);
+        }
+
+        return node;
+    }
+
+    // Parse a single condition (factor)
+    function parseFactor() {
+        const token = tokens[index++];
+        return createOperandNode(token);  // Create operand for a condition
+    }
+
+    return parseExpression();  // Start with the highest precedence (AND first)
+};
+
+// Main function to parse a rule string into an AST
+const parseRule = (ruleString) => {
+    const tokens = tokenizeRuleString(ruleString);  // Tokenize the rule string
+    return parseTokens(tokens);  // Build the AST from tokens
+};
+
+// Sample rule strings for testing
+const ruleString1 = "age > 30 AND department = 'Sales'";
+const ruleString2 = "age < 25 AND department = 'Marketing' OR experience > 5";
+
+// Parse the rule strings
+const ast1 = parseRule(ruleString1);
+const ast2 = parseRule(ruleString2);
+
+// Serialize and log the ASTs
 const serializeAST = (node) => {
     if (!node) return null;
-
     return {
         type: node.type,
         value: node.value,
-        left: serializeAST(node.left),  // Recursively serialize the left child
-        right: serializeAST(node.right)  // Recursively serialize the right child
+        left: serializeAST(node.left),
+        right: serializeAST(node.right),
     };
 };
 
-const main = () => {
-    // Example conditions based on the provided rule string
-    const condition1 = createOperandNode("age > 30");
-    const condition2 = createOperandNode("department = 'Sales'");
-    const condition3 = createOperandNode("age < 25");
-    const condition4 = createOperandNode("department = 'Marketing'");
-    const condition5 = createOperandNode("salary > 50000");
-    const condition6 = createOperandNode("experience > 5");
-
-    // Creating operator nodes for the left side of the main AND
-    const andNode1 = createOperatorNode("AND", condition1, condition2);
-    const andNode2 = createOperatorNode("AND", condition3, condition4);
-    const orNode1 = createOperatorNode("OR", andNode1, andNode2);
-    
-    // Creating operator nodes for the right side of the main AND
-    const orNode2 = createOperatorNode("OR", condition5, condition6);
-    
-    // Final root node combining both parts with AND
-    const rootNode = createOperatorNode("AND", orNode1, orNode2);
-
-    // Serialize the AST to JSON format
-    const jsonAST = serializeAST(rootNode);
-
-    // Log the serialized AST
-    console.log(JSON.stringify(jsonAST, null, 2)); // Pretty-print the JSON
-};
-
-// Run the main function
-main();
+console.log("AST for Rule 1:", JSON.stringify(serializeAST(ast1), null, 2));
+console.log("AST for Rule 2:", JSON.stringify(serializeAST(ast2), null, 2));
