@@ -1,5 +1,8 @@
 import React from 'react';
 import data from './treeData.json';
+import CreateRule from './components/CreateRule';
+import EvaluateRule from './components/EvaluateRule';
+import CombineRules from './components/CombineRule';
 
 function renderNode(node) {
   if (node.type === 'operand') {
@@ -23,10 +26,12 @@ function renderNode(node) {
 
 function App() {
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">Rule  Tree Structure</h1>
-      {renderNode(data)}
-    </div>
+    <div className="container mx-auto">
+    <h1 className="text-center text-3xl font-bold my-4">Rule Engine Application</h1>
+    <CreateRule />
+    <EvaluateRule />
+    <CombineRules />
+</div>
   );
 }
 

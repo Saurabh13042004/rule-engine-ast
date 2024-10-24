@@ -1,18 +1,15 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const {
   createRule,
   combineRules,
   evaluateRule,
-} = require('../controllers/ruleController');
+} = require("../controllers/ruleController");
 
-// Route to create a new rule
-router.post('/rules', createRule);
+router.post("/create-rule", createRule);
 
-// Route to combine multiple rules
-router.post('/combine', combineRules);
+router.post("/combine-rules", combineRules);
 
-// Route to evaluate a rule against user data
-router.post('/evaluate', evaluateRule);
+router.post("/evaluate-rule", evaluateRule);
 
 module.exports = router;
