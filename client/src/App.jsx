@@ -1,37 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import RuleForm from './components/RuleForm';
-import RuleList from './components/RuleList';
-import { getRules, evaluateRule } from './api';
+import React from 'react';
+import data from './treeData.json';
 
-const App = () => {
-    const [rules, setRules] = useState([]);
-
-    const fetchRules = async () => {
-        const fetchedRules = await getRules();
-        setRules(fetchedRules);
-    };
-
-    const handleRuleCreated = (newRule) => {
-        setRules((prevRules) => [...prevRules, newRule]);
-    };
-
-    const handleEvaluate = async (ruleId) => {
-        const data = { age: 32, location: 'NY' }; 
-        const result = await evaluateRule(ruleId, data);
-        alert(`Evaluation Result: ${result}`);
-    };
-
-    useEffect(() => {
-        fetchRules();
-    }, []);
-
+function renderNode(node) {
+  if (node.type === 'operand') {
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Rule Engine</h1>
-            <RuleForm onRuleCreated={handleRuleCreated} />
-            <RuleList rules={rules} onEvaluate={handleEvaluate} />
-        </div>
+      <div className="ml-4 mb-2">
+        <p className="text-gray-700">{node.value}</p>
+      </div>
     );
-};
+  } else if (node.type === 'operator') {
+    return (
+      <div className="mb-4">
+        <p className="font-bold text-blue-600">{node.value}</p>
+        <div className="ml-6 border-l border-gray-300 pl-4">
+          {node.left && renderNode(node.left)}
+          {node.right && renderNode(node.right)}
+        </div>
+      </div>
+    );
+  }
+}
+
+function App() {
+  return (
+    <div className="p-4">
+      <h1 className="text-xl font-semibold mb-4">JSON Tree Structure</h1>
+      {renderNode(data)}
+    </div>
+  );
+}
 
 export default App;

@@ -1,50 +1,67 @@
-const pool = require('../config/db');
-const { parseRule, evaluateAST } = require('../ast');
-
+const db = require('../config/db');
+const { parseRuleString,serializeAST, combineRules, evaluateAST } = require('../utils/parser');
 
 exports.createRule = async (req, res) => {
-  const { ruleName, ruleString } = req.body;
   try {
-    const ast = parseRule(ruleString);         
-    const astString = JSON.stringify(ast);      
-    const result = await pool.query(
-      'INSERT INTO rules (rule_name, ast) VALUES ($1, $2) RETURNING *',
-      [ruleName, astString]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to create rule' });
+      const { ruleName, ruleString } = req.body;
+      const ast = parseRuleString(ruleString);  // Parse the rule string into an AST
+      const serializedAST = serializeAST(ast);  // Serialize the AST to JSON
+
+      const result = await db.query(
+          'INSERT INTO rules (name, rule_string, ast) VALUES ($1, $2, $3) RETURNING *',
+          [ruleName, ruleString, JSON.stringify(serializedAST)]
+      );
+
+      res.status(201).json({
+          success: true,
+          rule: result.rows[0],
+      });
+  } catch (error) {
+      console.error('Error creating rule:', error);
+      res.status(500).json({ error: 'Failed to create rule', details: error.message });
   }
 };
 
-exports.getAllRules = async (req, res) => {
+// Combine multiple rules and store the combined AST
+exports.combineRules = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM rules');
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch rules' });
+    const { ruleIds, operator } = req.body;
+
+    // Fetch the rules by their IDs
+    const results = await db.query('SELECT ast FROM rules WHERE id = ANY($1)', [ruleIds]);
+    const asts = results.rows.map(row => JSON.parse(row.ast));
+
+    // Combine the rules into a single AST
+    const combinedAST = combineRules(asts, operator);
+
+    res.status(200).json({
+      success: true,
+      combinedAST,
+    });
+  } catch (error) {
+    console.error('Error combining rules:', error);
+    res.status(500).json({ error: 'Failed to combine rules' });
   }
 };
 
-
+// Evaluate a rule against user data
 exports.evaluateRule = async (req, res) => {
-  const { ruleId, data } = req.body;
   try {
-    const result = await pool.query('SELECT * FROM rules WHERE id = $1', [ruleId]);
-    const rule = result.rows[0];
+    const { ruleId, data } = req.body;
 
-    if (!rule) {
-      return res.status(404).json({ error: 'Rule not found' });
-    }
+    // Fetch the AST for the rule
+    const result = await db.query('SELECT ast FROM rules WHERE id = $1', [ruleId]);
+    const ast = JSON.parse(result.rows[0].ast);
 
-    const ast = JSON.parse(rule.ast);
-    const evaluationResult = evaluateAST(ast, data);
+    // Evaluate the AST against the user data
+    const isEligible = evaluateAST(ast, data);
 
-    res.status(200).json({ result: evaluationResult });
-  } catch (err) {
-    console.error(err);
+    res.status(200).json({
+      success: true,
+      eligible: isEligible,
+    });
+  } catch (error) {
+    console.error('Error evaluating rule:', error);
     res.status(500).json({ error: 'Failed to evaluate rule' });
   }
 };
