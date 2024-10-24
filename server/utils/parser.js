@@ -2,32 +2,48 @@
 
 const { createOperatorNode, createOperandNode } = require('./ast');
 
-const parseRuleString = (ruleString) => {
-    const operators = ['AND', 'OR'];
-    const tokens = ruleString.match(/(\(|\)|AND|OR|[^\s()]+)/g);
-    const stack = [];
+const tokenizeRuleString = (ruleString) => {
+    return ruleString.match(/(?:[a-zA-Z_]+\s*[><=]\s*'?\w+'?)|AND|OR/g);
+};
 
-    tokens.forEach(token => {
-        if (token === '(') {
-            stack.push(token);
-        } else if (token === ')') {
-            const subExpr = [];
-            while (stack.length && stack[stack.length - 1] !== '(') {
-                subExpr.unshift(stack.pop());
-            }
-            stack.pop(); // Remove '('
-            // Process the sub-expression recursively
-            stack.push(parseRuleString(subExpr.join(' ')));
-        } else if (operators.includes(token)) {
-            const right = stack.pop();
-            const left = stack.pop();
-            stack.push(createOperatorNode(token, left, right));
-        } else {
-            stack.push(createOperandNode(token)); // Push complete condition
+const parseTokens = (tokens) => {
+    let index = 0;
+
+    function parseExpression() {
+        let node = parseTerm();  
+        while (index < tokens.length && tokens[index] === "OR") {
+            const operator = tokens[index++];
+            const right = parseTerm(); 
+            node = createOperatorNode(operator, node, right);
         }
-    });
 
-    return stack[0]; // The root of the AST
+        return node;
+    }
+
+
+    function parseTerm() {
+        let node = parseFactor(); 
+        while (index < tokens.length && tokens[index] === "AND") {
+            const operator = tokens[index++];
+            const right = parseFactor();
+            node = createOperatorNode(operator, node, right);
+        }
+
+        return node;
+    }
+
+
+    function parseFactor() {
+        const token = tokens[index++];
+        return createOperandNode(token); 
+    }
+
+    return parseExpression(); 
+};
+
+const parseRule = (ruleString) => {
+    const tokens = tokenizeRuleString(ruleString);  
+    return parseTokens(tokens);  
 };
 
 const combineRules = (astArray, operator = 'AND') => {
@@ -63,7 +79,7 @@ const evaluateAST = (node, data) => {
 };
 
 module.exports = {
-    parseRuleString,
+    parseRule,
     combineRules,
     evaluateAST,
 };

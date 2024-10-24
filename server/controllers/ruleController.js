@@ -1,11 +1,12 @@
 const db = require('../config/db');
-const { parseRuleString,serializeAST, combineRules, evaluateAST } = require('../utils/parser');
+const { parseRule, combineRules, evaluateAST } = require('../utils/parser');
+const {serializeAST} = require('../utils/ast')
 
 exports.createRule = async (req, res) => {
   try {
       const { ruleName, ruleString } = req.body;
-      const ast = parseRuleString(ruleString);  // Parse the rule string into an AST
-      const serializedAST = serializeAST(ast);  // Serialize the AST to JSON
+      const ast = parseRule(ruleString); 
+      const serializedAST = serializeAST(ast);  
 
       const result = await db.query(
           'INSERT INTO rules (name, rule_string, ast) VALUES ($1, $2, $3) RETURNING *',
