@@ -1,117 +1,111 @@
-# Rule Engine Application
 
-This project is a simple rule engine application that determines user eligibility based on various attributes (like age, department, income, spend, etc.) using a Rule Engine with an Abstract Syntax Tree (AST). The application consists of a backend built with Node.js and PostgreSQL, and a frontend built with React, Vite, and Tailwind CSS.
+# Rule Engine with Abstract Syntax Tree (AST)
 
-## Table of Contents
+This project implements a rule engine application that uses an Abstract Syntax Tree (AST) to determine user eligibility based on specific attributes such as age, department, income, and experience. It allows dynamic rule creation, modification, and evaluation based on specified conditions.
 
-- [Features](#features)
-- [Technologies](#technologies)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+
+
+![image](https://github.com/user-attachments/assets/3069be8d-ba45-4469-aab9-b27d6542af8a)
 
 ## Features
 
-- Create and manage eligibility rules using a user-friendly interface.
-- Evaluate rules against user attributes to determine eligibility.
-- Dynamic creation and modification of rules using an Abstract Syntax Tree (AST).
-- Responsive design using Tailwind CSS.
+- Dynamic Rule Creation: Supports creating rules with conditional operators (AND, OR) and operands.
+- AST Representation: Uses a custom AST data structure for rule representation and evaluation.
+- API Endpoints:
+  - Create rules
+  - Combine multiple rules
+  - Evaluate user data against the rules
+- Flexible Modification: Rules can be modified or combined as needed.
+- Data Persistence: Rules and metadata are stored in an AWS RDS PostgreSQL instance.
 
-## Technologies
 
-- **Frontend:** React, Vite, Tailwind CSS
-- **Backend:** Node.js, Express, PostgreSQL
-- **Database:** PostgreSQL
+## Tech Stack
+
+**Client:** React + Vite + Tailwind CSS
+
+**Server:** Node.js + Express
+
+**Database** AWS RDS PostgreSQL
+
 
 ## Installation
 
-### Backend Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/yourusername/rule-engine.git
-   cd rule-engine/server
-2. **Install dependencies:**
-
-   ```bash
-    npm install
-
-3. **Create a .env file in the server folder with the following content:**
-   ```bash
-    DATABASE_URL=your_postgres_connection_string
-
-4. **Run the backend server:**
-
-   ```bash
-    npm start
+## Prerequisites
+- Docker (if not using Docker, see Manual Setup below)
+- PostgreSQL instance on AWS RDS (or another accessible PostgreSQL database)
 
 
-### Frontend Setup
-1. **Navigate to the frontend folder:**
 
-   ```bash
-    cd ../frontend
+### Docker Setup
+ 
+- Clone the repository:
 
-2. **Install dependencies:**
-   ```bash
-    npm install
+```bash
+git clone https://github.com/Saurabh13042004/weather-monitoring-system.git
+cd weather-monitoring-system
 
-3. **Run the frontend development server:**
+```
+- Navigate to the server folder:
 
-    ```bash
-    npm run dev
+```bash
+cd server
 
-4. **Open your browser and visit http://localhost:5173.**
+```
 
-## Usage
+- Open the docker-compose.yml file, and add your PostgreSQL credentials and connection URI:
 
-### Creating a Rule
+```bash
+environment:
+  - PGHOST=your_postgresql_host
+  - PGUSER=your_postgresql_username
+  - PGPASSWORD=your_postgresql_password
+  - PGDATABASE=your_postgresql_database
+```
 
-- Enter a rule name and the rule string in the input fields.
-- Click the "Create Rule" button to save the rule.
+- Build and run the Docker containers:
 
-### Evaluating a Rule
+```bash
+docker-compose up --build
 
-- Click the "Evaluate" button next to any existing rule to evaluate it against predefined sample data.
+```
+- Once the backend is up, note the server URL (e.g., http://localhost:5000). You'll use this for the frontend setup.
 
-### Viewing Rules
 
-- Existing rules will be displayed in a list format.
+### Manual Setup (Without Docker)
+ 
+- In the server folder, create an .env file:
 
-## API Endpoints
+```bash
+touch .env
 
-### Backend API Endpoints
 
-#### POST /api/rules
+```
+- Add the following environment variables to your .env file:
 
-- **Description:** Create a new rule.
-- **Request Body:**
+```bash
+environment:
+  - PGHOST=your_postgresql_host
+  - PGUSER=your_postgresql_username
+  - PGPASSWORD=your_postgresql_password
+  - PGDATABASE=your_postgresql_database
 
-  ```json
-  {
-    "ruleName": "string",
-    "ruleString": "string"
-  }
-- Response: Returns the created rule object.
-GET /api/rules
-- Description: Retrieve all rules.
-- Response: Returns an array of rules.
-POST /api/evaluate
-- Description: Evaluate a rule against provided data.
-  ```json
-   {
-  "ruleId": "string",
-  "data": {
-    "age": number,
-    "department": "string",
-    "salary": number,
-    "experience": number
-  }
-   }
 
-- Response: Returns a boolean indicating whether the user is eligible based on the rule.
+```
+
+- Start the backend:
+
+```bash
+npm install
+npm start
+
+```
+
+- Once the backend is up, note the server URL for the frontend setup.
+
+## Frontend Setup
+
+### Note: Environment variables for the frontend are pending deployment fixes for Vercel. Once resolved, setup instructions will be updated here.
+
+In the frontend code, in components CreateRule , Evaluate and Combine under the handleSubmit you can paste that 
 
 
