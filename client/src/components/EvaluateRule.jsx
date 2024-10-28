@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-
+import ClipLoader from 'react-spinners/ClipLoader';
 function EvaluateRule() {
     const [ast, setAst] = useState('');
     const [data, setData] = useState('');
     const [result, setResult] = useState(null);
+    const [isLoading,setIsLoading] = useState(false);
   
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setIsLoading(true)
       try {
         const res = await fetch("https://rule-engine-ast-s01d.onrender.com/api/evaluate-rule", {
           method: 'POST',
@@ -17,6 +19,8 @@ function EvaluateRule() {
         setResult(dataResult);
       } catch (error) {
         console.error('Error evaluating rule:', error);
+      } finally{
+        setIsLoading(false)
       }
     };
   
@@ -76,11 +80,18 @@ function EvaluateRule() {
             </button>
           </div>
         </form>
-        {result && (
-          <div className="mt-4 p-4 bg-green-100 rounded-md">
-            <pre className="text-sm">{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        )}
+        {isLoading && (
+                <div className="flex justify-center mt-4">
+                    <ClipLoader size={30} color="#123abc" loading={isLoading} />
+                    <p className="ml-2 text-gray-600">Please wait, evaluate the rule...</p>
+                    <p className="ml-2 text-gray-600">Server is deployed in free instance will take a minute to give result</p>
+                </div>
+            )}
+            {result && !isLoading && (
+                <div className="mt-4 p-4 bg-green-100 rounded-md">
+                    <pre className="text-sm">{JSON.stringify(result, null, 2)}</pre>
+                </div>
+            )}
       </div>
     );
   }

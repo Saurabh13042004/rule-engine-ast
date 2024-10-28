@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-
+import ClipLoader from 'react-spinners/ClipLoader';
 function CombineRules() {
     const [rules, setRules] = useState(['']);
     const [operator, setOperator] = useState('AND');
     const [response, setResponse] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
   
     const handleAddRule = () => {
       setRules([...rules, '']);
@@ -17,6 +19,7 @@ function CombineRules() {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setIsLoading(true)
       try {
         const res = await fetch("https://rule-engine-ast-s01d.onrender.com/api/combine-rules", {
           method: 'POST',
@@ -27,6 +30,8 @@ function CombineRules() {
         setResponse(data);
       } catch (error) {
         console.error('Error combining rules:', error);
+      }finally{
+        setIsLoading(false)
       }
     };
   
@@ -80,11 +85,19 @@ function CombineRules() {
             </button>
           </div>
         </form>
-        {response && (
-          <div className="mt-4 p-4 bg-green-100 rounded-md">
-            <pre className="text-sm">{JSON.stringify(response, null, 2)}</pre>
-          </div>
-        )}
+        {isLoading && (
+                <div className="flex justify-center mt-4">
+                    <ClipLoader size={30} color="#123abc" loading={isLoading} />
+                    <p className="ml-2 text-gray-600">Please wait, combining the rule...</p>
+                    <p className="ml-2 text-gray-600">Server is deployed in free instance will take a minute to give result</p>
+                </div>
+            )}
+            {response && !isLoading && (
+                <div className="mt-4 p-4 bg-green-100 rounded-md">
+                    <pre className="text-sm">{JSON.stringify(response, null, 2)}</pre>
+                </div>
+            )}
+
       </div>
     );
   }

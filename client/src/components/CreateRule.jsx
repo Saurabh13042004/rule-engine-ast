@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import ClipLoader from 'react-spinners/ClipLoader';
 
 function CreateRule() {
     const [ruleName, setRuleName] = useState('');
     const [ruleString, setRuleString] = useState('');
     const [response, setResponse] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
   
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setIsLoading(true);
       try {
         const res = await fetch("https://rule-engine-ast-s01d.onrender.com/api/create-rule", {
           method: 'POST',
@@ -17,6 +20,8 @@ function CreateRule() {
         setResponse(data);
       } catch (error) {
         console.error('Error creating rule:', error);
+      }finally{
+        setIsLoading(false);
       }
     };
   
@@ -60,11 +65,18 @@ function CreateRule() {
             </button>
           </div>
         </form>
-        {response && (
-          <div className="mt-4 p-4 bg-green-100 rounded-md">
-            <pre className="text-sm">{JSON.stringify(response, null, 2)}</pre>
-          </div>
-        )}
+        {isLoading && (
+                <div className="flex justify-center mt-4">
+                    <ClipLoader size={30} color="#123abc" loading={isLoading} />
+                    <p className="ml-2 text-gray-600">Please wait, creating the rule...</p>
+                    <p className="ml-2 text-gray-600">Server is deployed in free instance will take a minute to give result</p>
+                </div>
+            )}
+            {response && !isLoading && (
+                <div className="mt-4 p-4 bg-green-100 rounded-md">
+                    <pre className="text-sm">{JSON.stringify(response, null, 2)}</pre>
+                </div>
+            )}
       </div>
     );
   }
