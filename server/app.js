@@ -6,6 +6,9 @@ const cors = require('cors');
 
 app.use(bodyParser.json()); 
 app.use(cors());
+app.get('/',(req,res){
+  res.send("server is started")
+})
 
 app.use('/api', ruleRoutes);
 
